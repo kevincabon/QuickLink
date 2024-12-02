@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { LinkIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const emit = defineEmits<{
@@ -11,46 +11,62 @@ const customPath = ref('');
 const expiresIn = ref<number>();
 const error = ref('');
 const isLoading = ref(false);
+const isUrlValid = ref(true);
+const hasInteracted = ref(false);
 
-async function handleSubmit() {
-  if (!url.value) {
-    error.value = 'Please enter a URL';
+// Validation en temps réel de l'URL
+watch(url, (newUrl) => {
+  if (!newUrl && !hasInteracted.value) {
     return;
   }
 
-  let isValidUrl = false;
   try {
-    new URL(url.value);
-    isValidUrl = true;
+    new URL(newUrl);
+    isUrlValid.value = true;
+    error.value = '';
   } catch {
+    isUrlValid.value = false;
+  }
+});
+
+const handleUrlInput = () => {
+  hasInteracted.value = true;
+};
+
+async function handleSubmit() {
+  if (!url.value) {
+    error.value = '🔗 Oops! Looks like you forgot to enter a URL';
+    return;
+  }
+
+  if (!isUrlValid.value) {
     error.value = 'Please enter a valid URL';
     return;
   }
 
-  if (isValidUrl) {
-    try {
-      error.value = '';
-      isLoading.value = true;
-      const result = await emit('submit', url.value, customPath.value, expiresIn.value) || {};
-      
-      if (result.error) {
-        error.value = result.error;
-        // Ne pas réinitialiser le formulaire en cas d'erreur de custom URL
-        if (result.error !== 'This custom URL is already taken') {
-          url.value = '';
-          customPath.value = '';
-          expiresIn.value = undefined;
-        }
-      } else {
-        // Réinitialiser le formulaire seulement si tout s'est bien passé
+  try {
+    error.value = '';
+    isLoading.value = true;
+    const result = await emit('submit', url.value, customPath.value, expiresIn.value) || {};
+    
+    if (result.error) {
+      error.value = result.error;
+      // Ne pas réinitialiser le formulaire en cas d'erreur de custom URL
+      if (result.error !== 'This custom URL is already taken') {
         url.value = '';
         customPath.value = '';
         expiresIn.value = undefined;
-        error.value = '';
       }
-    } finally {
-      isLoading.value = false;
+    } else {
+      // Réinitialiser le formulaire seulement si tout s'est bien passé
+      url.value = '';
+      customPath.value = '';
+      expiresIn.value = undefined;
+      error.value = '';
+      hasInteracted.value = false; // Réinitialiser l'état d'interaction
     }
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>
@@ -66,8 +82,9 @@ async function handleSubmit() {
           v-model="url"
           type="url"
           placeholder="Enter your URL here"
+          @input="handleUrlInput"
           class="w-full pl-10 pr-4 py-3 text-lg rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-800 transition-all duration-200"
-          :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-200': error }"
+          :class="{ 'border-red-500 focus:border-red-600 focus:ring-red-200 dark:border-red-500 dark:focus:border-red-400': !isUrlValid && hasInteracted }"
         />
       </div>
 
