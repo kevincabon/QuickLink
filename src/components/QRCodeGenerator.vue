@@ -12,7 +12,8 @@ const qrCodeDataUrl = ref<string>('');
 const options = ref<QRCodeOptions>({
   color: '#000000',
   backgroundColor: '#ffffff',
-  width: 400,
+  width: 260,
+  height: 260
 });
 
 async function updateQRCode() {
@@ -23,15 +24,16 @@ async function updateQRCode() {
   }
 }
 
-function downloadQRCode() {
+async function downloadQRCode() {
   const link = document.createElement('a');
   link.download = 'qrcode.png';
   link.href = qrCodeDataUrl.value;
   link.click();
 }
 
+// Observer les changements de l'URL et des options
 watch(() => props.url, updateQRCode, { immediate: true });
-watch(() => options.value, updateQRCode, { deep: true });
+watch(() => options.value, updateQRCode, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -39,51 +41,68 @@ watch(() => options.value, updateQRCode, { deep: true });
     <div class="flex flex-col items-center gap-8">
       <div class="flex items-center gap-2">
         <QrCodeIcon class="w-6 h-6 text-gray-600 dark:text-gray-400" />
-        <h2 class="text-xl font-semibold">Générateur de QR Code</h2>
+        <h2 class="text-xl font-semibold">QR Code Generator</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-xl">
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Couleur du QR</label>
-          <input
-            v-model="options.color"
-            type="color"
-            class="h-10 rounded-lg cursor-pointer w-full"
-          />
+      <div class="grid grid-cols-2 gap-8 w-full max-w-xl">
+        <div class="flex flex-col items-center gap-3">
+          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">QR Color</label>
+          <div class="relative group">
+            <div class="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
+              <input
+                v-model="options.color"
+                type="color"
+                class="w-8 h-8 rounded-lg cursor-pointer border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 absolute opacity-0 z-10"
+              />
+              <div 
+                class="w-8 h-8 rounded-lg shadow-inner"
+                :style="{ backgroundColor: options.color }"
+              ></div>
+              <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">
+                {{ options.color.toUpperCase() }}
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Couleur de fond</label>
-          <input
-            v-model="options.backgroundColor"
-            type="color"
-            class="h-10 rounded-lg cursor-pointer w-full"
-          />
-        </div>
-        <div class="flex flex-col gap-2 md:col-span-2">
-          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Taille</label>
-          <input
-            v-model="options.width"
-            type="range"
-            min="300"
-            max="800"
-            step="50"
-            class="w-full"
-          />
-          <div class="text-sm text-gray-500 dark:text-gray-400 text-center">
-            {{ options.width }}px
+
+        <div class="flex flex-col items-center gap-3">
+          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Background Color</label>
+          <div class="relative group">
+            <div class="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
+              <input
+                v-model="options.backgroundColor"
+                type="color"
+                class="w-8 h-8 rounded-lg cursor-pointer border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 transition-all duration-200 absolute opacity-0 z-10"
+              />
+              <div 
+                class="w-8 h-8 rounded-lg shadow-inner relative overflow-hidden"
+                :style="{ backgroundColor: options.backgroundColor }"
+              >
+                <!-- Grille de fond pour visualiser la couleur blanche -->
+                <div v-if="options.backgroundColor.toLowerCase() === '#ffffff'" class="absolute inset-0 bg-gray-100 dark:bg-gray-700 opacity-50 grid grid-cols-2">
+                  <div class="bg-white"></div>
+                  <div class="bg-gray-100 dark:bg-gray-700"></div>
+                  <div class="bg-gray-100 dark:bg-gray-700"></div>
+                  <div class="bg-white"></div>
+                </div>
+              </div>
+              <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">
+                {{ options.backgroundColor.toUpperCase() }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
       
       <div 
         v-if="qrCodeDataUrl" 
-        class="bg-white dark:bg-gray-700 rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl"
+        class="mt-2 bg-white dark:bg-gray-700 rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl"
       >
         <img 
           :src="qrCodeDataUrl" 
           alt="QR Code" 
-          class="transition-all duration-300 hover:scale-105"
-          :style="{ width: `${options.width}px`, height: `${options.width}px` }" 
+          class="transition-all duration-300 hover:scale-105 rounded-lg p-4"
+          :style="{ width: `${options.width}px`, height: `${options.height}px` }" 
         />
       </div>
       
@@ -92,7 +111,7 @@ watch(() => options.value, updateQRCode, { deep: true });
         class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
       >
         <ArrowDownTrayIcon class="w-5 h-5" />
-        Télécharger le QR Code
+        Download QR Code
       </button>
     </div>
   </div>

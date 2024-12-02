@@ -13,13 +13,16 @@ const isDarkMode = computed(() => colorMode.value === 'dark');
 const shortLink = ref<ShortLink | null>(null);
 const error = ref('');
 
-async function handleURLSubmit(url: string) {
+async function handleURLSubmit(url: string, customPath?: string, expiresIn?: number) {
   try {
     error.value = '';
-    shortLink.value = await shortenUrl(url);
+    shortLink.value = await shortenUrl(url, customPath, expiresIn);
+    return { error: undefined }; // Retourne explicitement un objet avec error undefined en cas de succès
   } catch (e) {
-    error.value = 'Failed to shorten URL. Please try again.';
+    const errorMessage = e instanceof Error ? e.message : 'Failed to shorten URL. Please try again.';
+    error.value = errorMessage;
     console.error(e);
+    return { error: errorMessage }; // Retourne l'erreur au composant URLInput
   }
 }
 
