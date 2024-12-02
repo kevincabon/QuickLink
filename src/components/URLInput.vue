@@ -3,10 +3,12 @@ import { ref } from 'vue';
 import { LinkIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
 
 const emit = defineEmits<{
-  (e: 'submit', url: string): void;
+  (e: 'submit', url: string, customPath?: string, expiresIn?: number): Promise<{ error?: string }>;
 }>();
 
 const url = ref('');
+const customPath = ref('');
+const expiresIn = ref<number>();
 const error = ref('');
 const isLoading = ref(false);
 
@@ -16,16 +18,39 @@ async function handleSubmit() {
     return;
   }
 
+  let isValidUrl = false;
   try {
     new URL(url.value);
-    error.value = '';
-    isLoading.value = true;
-    await emit('submit', url.value);
-    url.value = '';
+    isValidUrl = true;
   } catch {
     error.value = 'Please enter a valid URL';
-  } finally {
-    isLoading.value = false;
+    return;
+  }
+
+  if (isValidUrl) {
+    try {
+      error.value = '';
+      isLoading.value = true;
+      const result = await emit('submit', url.value, customPath.value, expiresIn.value) || {};
+      
+      if (result.error) {
+        error.value = result.error;
+        // Ne pas réinitialiser le formulaire en cas d'erreur de custom URL
+        if (result.error !== 'This custom URL is already taken') {
+          url.value = '';
+          customPath.value = '';
+          expiresIn.value = undefined;
+        }
+      } else {
+        // Réinitialiser le formulaire seulement si tout s'est bien passé
+        url.value = '';
+        customPath.value = '';
+        expiresIn.value = undefined;
+        error.value = '';
+      }
+    } finally {
+      isLoading.value = false;
+    }
   }
 }
 </script>
@@ -45,6 +70,33 @@ async function handleSubmit() {
           :class="{ 'border-red-300 focus:border-red-500 focus:ring-red-200': error }"
         />
       </div>
+
+      <!-- Custom Path Input -->
+      <div class="relative">
+        <input
+          v-model="customPath"
+          type="text"
+          placeholder="Custom path (optional)"
+          class="w-full px-4 py-2 text-base rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-800 transition-all duration-200"
+        />
+      </div>
+
+      <!-- Expiration Time Input -->
+      <div class="relative">
+        <select
+          v-model="expiresIn"
+          class="w-full px-4 py-2 text-base rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-800 transition-all duration-200"
+        >
+          <option :value="undefined">No expiration</option>
+          <option :value="1">1 hour</option>
+          <option :value="2">2 hours</option>
+          <option :value="4">4 hours</option>
+          <option :value="8">8 hours</option>
+          <option :value="24">24 hours</option>
+          <option :value="168">1 week</option>
+        </select>
+      </div>
+
       <button
         type="submit"
         :disabled="isLoading"
