@@ -8,11 +8,10 @@ export async function shortenUrl(
   expiresInHours?: number
 ): Promise<ShortLink> {
   try {
-    const shortId = customPath || generateShortId();
-    const shortUrl = `${environment.baseUrl}/${shortId}`;
-
-    // Vérifier si le custom path est déjà utilisé et n'est pas expiré
     if (customPath) {
+      const shortId = customPath;
+      const shortUrl = `${environment.baseUrl}/${shortId}`;
+
       const { data: existingUrl } = await supabase
         .from('short_links')
         .select('id, expires_at')
@@ -20,20 +19,25 @@ export async function shortenUrl(
         .single();
 
       if (existingUrl) {
-        // Vérifier si l'URL existante n'est pas expirée
-        const isExpired = existingUrl.expires_at && new Date(existingUrl.expires_at) < new Date();
-        
-        if (!isExpired) {
-          throw new Error('This custom URL is already taken');
-        } else {
-          // Si l'URL est expirée, on la supprime pour pouvoir la réutiliser
-          await supabase
-            .from('short_links')
-            .delete()
-            .eq('id', existingUrl.id);
-        }
+        throw new Error('This custom URL is already taken');
+      }
+    } else {
+      // Pour les URLs non-custom, chercher d'abord un lien existant sans expiration
+      const { data: existingLinks } = await supabase
+        .from('short_links')
+        .select('*')
+        .eq('original_url', originalUrl)
+        .eq('custom_path', '') // Cherche les liens avec custom_path vide
+        .is('expires_at', null);
+
+      // S'il existe un lien sans expiration, on le réutilise
+      if (existingLinks && existingLinks.length > 0) {
+        return existingLinks[0];
       }
     }
+
+    const shortId = customPath || generateShortId();
+    const shortUrl = `${environment.baseUrl}/${shortId}`;
 
     // Calculer la date d'expiration si nécessaire
     const expiresAt = expiresInHours
@@ -46,7 +50,7 @@ export async function shortenUrl(
         {
           original_url: originalUrl,
           short_url: shortUrl,
-          custom_path: customPath,
+          custom_path: customPath || '', // S'assurer que custom_path est une chaîne vide si non défini
           expires_at: expiresAt,
           usage_count: 0,
         },
