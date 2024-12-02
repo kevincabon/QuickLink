@@ -10,12 +10,11 @@ export async function shortenUrl(
   try {
     if (customPath) {
       const shortId = customPath;
-      const shortUrl = `${environment.baseUrl}/${shortId}`;
 
       const { data: existingUrl } = await supabase
         .from('short_links')
         .select('id, expires_at')
-        .eq('short_url', shortUrl)
+        .eq('custom_path', shortId)
         .single();
 
       if (existingUrl) {
@@ -50,7 +49,7 @@ export async function shortenUrl(
         {
           original_url: originalUrl,
           short_url: shortUrl,
-          custom_path: customPath || '', // S'assurer que custom_path est une chaîne vide si non défini
+          custom_path: shortId, // Stocke le shortId au lieu de customPath
           expires_at: expiresAt,
           usage_count: 0,
         },
