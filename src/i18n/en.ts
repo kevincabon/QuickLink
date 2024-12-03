@@ -10,7 +10,7 @@ export default {
     customPath: {
       label: 'Customize your link (optional):',
       placeholder: 'Ex: my-awesome-link',
-      help: 'Your custom link will appear as: quicklink.fr/your-text'
+      help: 'Your custom link will appear as: lnkqr.co/your-text'
     },
     expiration: {
       label: 'Link validity duration (optional):',
@@ -58,5 +58,8 @@ export default {
       default: 'An error occurred',
       backHome: 'Back to Home'
     }
+  },
+  app: {
+    lastUpdate: 'Last update: {date}'
   }
 }
