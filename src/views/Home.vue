@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useColorMode } from '@vueuse/core';
-import { SunIcon, MoonIcon, LinkIcon } from '@heroicons/vue/24/solid';
+import { SunIcon, MoonIcon, LinkIcon, LanguageIcon, DocumentTextIcon } from '@heroicons/vue/24/solid';
 import URLInput from '../components/URLInput.vue';
 import QRCodeGenerator from '../components/QRCodeGenerator.vue';
 import ResultCard from '../components/ResultCard.vue';
 import { shortenUrl } from '../utils/url';
 import type { ShortLink } from '../types';
+import { useI18n } from 'vue-i18n';
 
 const colorMode = useColorMode();
 const isDarkMode = computed(() => colorMode.value === 'dark');
 const shortLink = ref<ShortLink | null>(null);
 const error = ref('');
+const { locale } = useI18n();
+const availableLocales = ['en', 'fr'];
 
 async function handleURLSubmit(url: string, customPath?: string, expiresIn?: number) {
   try {
@@ -29,6 +32,12 @@ async function handleURLSubmit(url: string, customPath?: string, expiresIn?: num
 function toggleColorMode() {
   colorMode.value = colorMode.value === 'dark' ? 'light' : 'dark';
 }
+
+function toggleLanguage() {
+  const currentIndex = availableLocales.indexOf(locale.value);
+  const nextIndex = (currentIndex + 1) % availableLocales.length;
+  locale.value = availableLocales[nextIndex];
+}
 </script>
 
 <template>
@@ -41,13 +50,21 @@ function toggleColorMode() {
             QuickLink
           </h1>
         </div>
-        <button
-          @click="toggleColorMode"
-          class="p-2 rounded-full bg-white dark:bg-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-        >
-          <SunIcon v-if="isDarkMode" class="w-6 h-6 text-yellow-500" />
-          <MoonIcon v-else class="w-6 h-6 text-gray-700" />
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            @click="toggleLanguage"
+            class="p-2 rounded-full bg-white dark:bg-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
+            <LanguageIcon class="w-6 h-6 text-blue-500" />
+          </button>
+          <button
+            @click="toggleColorMode"
+            class="p-2 rounded-full bg-white dark:bg-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
+            <SunIcon v-if="isDarkMode" class="w-6 h-6 text-yellow-500" />
+            <MoonIcon v-else class="w-6 h-6 text-gray-700" />
+          </button>
+        </div>
       </header>
 
       <main class="max-w-2xl mx-auto">
@@ -70,8 +87,9 @@ function toggleColorMode() {
         </div>
         <div class="flex items-center gap-4">
           <span>Made with ❤️</span>
-          <a href="https://github.com/kevincabon" target="_blank" rel="noopener" class="hover:text-blue-500 transition-colors">
-            GitHub
+          <a href="https://notebloomapp.com" target="_blank" rel="noopener" class="hover:text-blue-500 transition-colors flex items-center gap-1">
+            <DocumentTextIcon class="w-4 h-4" />
+            NoteBloom
           </a>
         </div>
       </div>

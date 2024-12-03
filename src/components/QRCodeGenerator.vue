@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { QrCodeIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
 import { generateQRCode } from '../utils/qrcode';
 import type { QRCodeOptions } from '../types';
+
+const { t } = useI18n();
 
 const props = defineProps<{
   url: string;
@@ -41,12 +44,12 @@ watch(() => options.value, updateQRCode, { deep: true, immediate: true });
     <div class="flex flex-col items-center gap-8">
       <div class="flex items-center gap-2">
         <QrCodeIcon class="w-6 h-6 text-gray-600 dark:text-gray-400" />
-        <h2 class="text-xl font-semibold">QR Code Generator</h2>
+        <h2 class="text-xl font-semibold">{{ t('qrCode.title') }}</h2>
       </div>
 
       <div class="grid grid-cols-2 gap-8 w-full max-w-xl">
         <div class="flex flex-col items-center gap-3">
-          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">QR Color</label>
+          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ t('qrCode.color.label') }}</label>
           <div class="relative group">
             <div class="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
               <input
@@ -66,7 +69,7 @@ watch(() => options.value, updateQRCode, { deep: true, immediate: true });
         </div>
 
         <div class="flex flex-col items-center gap-3">
-          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">Background Color</label>
+          <label class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ t('qrCode.color.background') }}</label>
           <div class="relative group">
             <div class="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
               <input
@@ -108,10 +111,10 @@ watch(() => options.value, updateQRCode, { deep: true, immediate: true });
       
       <button
         @click="downloadQRCode"
-        class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+        class="mt-4 flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-800/30 dark:text-blue-400 dark:hover:bg-blue-700/40 rounded-lg transition-all duration-200"
       >
         <ArrowDownTrayIcon class="w-5 h-5" />
-        Download QR Code
+        {{ t('qrCode.download') }}
       </button>
     </div>
   </div>

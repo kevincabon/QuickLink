@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { ClipboardDocumentIcon, CheckIcon, ArrowTopRightOnSquareIcon } from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
 import type { ShortLink } from '../types';
 
 const props = defineProps<{
   shortLink: ShortLink;
 }>();
+
+const { t } = useI18n();
 
 const copied = ref(false);
 
@@ -26,7 +29,7 @@ async function copyToClipboard() {
   <div class="w-full backdrop-blur-lg bg-white/50 dark:bg-gray-800/50 p-6 rounded-2xl shadow-xl">
     <div class="flex flex-col gap-3">
       <div class="flex items-center justify-between">
-        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Shortened URL</span>
+        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ t('resultCard.title') }}</span>
         <div class="flex gap-2">
           <a
             :href="shortLink.short_url"
@@ -42,7 +45,7 @@ async function copyToClipboard() {
           >
             <ClipboardDocumentIcon v-if="!copied" class="w-4 h-4" />
             <CheckIcon v-else class="w-4 h-4" />
-            {{ copied ? 'Copied!' : 'Copy' }}
+            {{ copied ? t('resultCard.copied') : t('resultCard.copy') }}
           </button>
         </div>
       </div>
