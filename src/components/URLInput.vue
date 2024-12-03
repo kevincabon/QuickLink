@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { LinkIcon, ArrowPathIcon } from '@heroicons/vue/24/outline';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (e: 'submit', url: string, customPath?: string, expiresIn?: number): Promise<{ error?: string }>;
@@ -35,12 +38,12 @@ const handleUrlInput = () => {
 
 async function handleSubmit() {
   if (!url.value) {
-    error.value = '🔗 Oops! Looks like you forgot to enter a URL';
+    error.value = t('errors.missingUrl');
     return;
   }
 
   if (!isUrlValid.value) {
-    error.value = 'Please enter a valid URL';
+    error.value = t('errors.invalidUrl');
     return;
   }
 
@@ -50,7 +53,9 @@ async function handleSubmit() {
     const result = await emit('submit', url.value, customPath.value, expiresIn.value) || {};
     
     if (result.error) {
-      error.value = result.error;
+      error.value = result.error === 'This custom URL is already taken' 
+        ? t('errors.customPathTaken')
+        : t('errors.default');
       // Ne pas réinitialiser le formulaire en cas d'erreur de custom URL
       if (result.error !== 'This custom URL is already taken') {
         url.value = '';
@@ -73,45 +78,56 @@ async function handleSubmit() {
 
 <template>
   <form @submit.prevent="handleSubmit" class="w-full">
+    <!-- Description principale -->
+    <div class="text-center mb-6">
+      <p class="text-gray-600 dark:text-gray-300 mb-2">{{ t('welcome.title') }}</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('welcome.subtitle') }}</p>
+    </div>
     <div class="flex flex-col gap-4">
-      <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <LinkIcon class="h-5 w-5 text-gray-400" />
+      <div class="space-y-2">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <LinkIcon class="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            v-model="url"
+            type="url"
+            :placeholder="t('form.url.placeholder')"
+            @input="handleUrlInput"
+            class="w-full pl-10 pr-4 py-3 text-lg rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-800 transition-all duration-200"
+            :class="{ 'border-red-500 focus:border-red-600 focus:ring-red-200 dark:border-red-500 dark:focus:border-red-400': !isUrlValid && hasInteracted }"
+          />
         </div>
-        <input
-          v-model="url"
-          type="url"
-          placeholder="Enter your URL here"
-          @input="handleUrlInput"
-          class="w-full pl-10 pr-4 py-3 text-lg rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-800 transition-all duration-200"
-          :class="{ 'border-red-500 focus:border-red-600 focus:ring-red-200 dark:border-red-500 dark:focus:border-red-400': !isUrlValid && hasInteracted }"
-        />
       </div>
 
-      <!-- Custom Path Input -->
-      <div class="relative">
-        <input
-          v-model="customPath"
-          type="text"
-          placeholder="Custom path (optional)"
-          class="w-full px-4 py-2 text-base rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-800 transition-all duration-200"
-        />
+      <div class="space-y-2">
+        <p class="text-sm text-gray-500 dark:text-gray-400 ml-1">{{ t('form.customPath.label') }}</p>
+        <div class="relative">
+          <input
+            v-model="customPath"
+            type="text"
+            :placeholder="t('form.customPath.placeholder')"
+            class="w-full px-4 py-2 text-base rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-800 transition-all duration-200"
+          />
+        </div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 ml-1">{{ t('form.customPath.help') }}</p>
       </div>
 
-      <!-- Expiration Time Input -->
-      <div class="relative">
+      <div class="space-y-2">
+        <p class="text-sm text-gray-500 dark:text-gray-400 ml-1">{{ t('form.expiration.label') }}</p>
         <select
           v-model="expiresIn"
           class="w-full px-4 py-2 text-base rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:focus:border-blue-400 dark:focus:ring-blue-800 transition-all duration-200"
         >
-          <option :value="undefined">No expiration</option>
-          <option :value="1">1 hour</option>
-          <option :value="2">2 hours</option>
-          <option :value="4">4 hours</option>
-          <option :value="8">8 hours</option>
-          <option :value="24">24 hours</option>
-          <option :value="168">1 week</option>
+          <option :value="undefined">{{ t('form.expiration.options.none') }}</option>
+          <option :value="1">{{ t('form.expiration.options.1h') }}</option>
+          <option :value="2">{{ t('form.expiration.options.2h') }}</option>
+          <option :value="4">{{ t('form.expiration.options.4h') }}</option>
+          <option :value="8">{{ t('form.expiration.options.8h') }}</option>
+          <option :value="24">{{ t('form.expiration.options.24h') }}</option>
+          <option :value="168">{{ t('form.expiration.options.1w') }}</option>
         </select>
+        <p class="text-xs text-gray-500 dark:text-gray-400 ml-1">{{ t('form.expiration.help') }}</p>
       </div>
 
       <button
@@ -120,7 +136,7 @@ async function handleSubmit() {
         class="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
       >
         <ArrowPathIcon v-if="isLoading" class="h-5 w-5 animate-spin" />
-        <span>{{ isLoading ? 'Shortening...' : 'Shorten URL' }}</span>
+        <span>{{ isLoading ? t('form.button.shortening') : t('form.button.shorten') }}</span>
       </button>
       <p v-if="error" class="text-red-500 text-sm">{{ error }}</p>
     </div>
