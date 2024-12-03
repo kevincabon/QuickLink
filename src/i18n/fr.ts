@@ -10,7 +10,7 @@ export default {
     customPath: {
       label: 'Personnalisez votre lien (optionnel) :',
       placeholder: 'Ex: mon-super-lien',
-      help: 'Votre lien personnalisé apparaîtra comme : quicklink.fr/votre-texte'
+      help: 'Votre lien personnalisé apparaîtra comme : lnkqr.co/votre-texte'
     },
     expiration: {
       label: 'Durée de validité du lien (optionnel) :',
@@ -58,5 +58,8 @@ export default {
       default: 'Une erreur est survenue',
       backHome: 'Retour à l\'accueil'
     }
+  },
+  app: {
+    lastUpdate: 'Dernière mise à jour : {date}'
   }
 }

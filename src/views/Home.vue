@@ -8,13 +8,25 @@ import ResultCard from '../components/ResultCard.vue';
 import { shortenUrl } from '../utils/url';
 import type { ShortLink } from '../types';
 import { useI18n } from 'vue-i18n';
+import { appConfig } from '../config/app';
 
 const colorMode = useColorMode();
 const isDarkMode = computed(() => colorMode.value === 'dark');
 const shortLink = ref<ShortLink | null>(null);
 const error = ref('');
-const { locale } = useI18n();
-const availableLocales = ['en', 'fr'];
+const { locale, t } = useI18n();
+const availableLocales = ['en', 'fr']
+
+// Formater la date de mise à jour
+const formattedUpdateDate = computed(() => {
+  const date = new Date(appConfig.lastUpdate);
+  const formattedDate = date.toLocaleDateString(locale.value === 'fr' ? 'fr-FR' : 'en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  return t('app.lastUpdate', { date: formattedDate });
+});
 
 async function handleURLSubmit(url: string, customPath?: string, expiresIn?: number) {
   try {
@@ -47,7 +59,7 @@ function toggleLanguage() {
         <div class="flex items-center gap-3">
           <LinkIcon class="w-8 h-8 text-blue-600 dark:text-blue-400" />
           <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 text-transparent bg-clip-text">
-            QuickLink
+            LinkQR
           </h1>
         </div>
         <div class="flex items-center gap-2">
@@ -83,7 +95,10 @@ function toggleLanguage() {
     <footer class="fixed bottom-0 w-full py-3 px-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
       <div class="container mx-auto flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
         <div>
-          QuickLink <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 rounded-full text-xs">Beta 1.0</span>
+          LinkQR <span 
+            class="px-2 py-1 bg-blue-100 dark:bg-blue-900 rounded-full text-xs cursor-help" 
+            :title="formattedUpdateDate"
+          >Beta {{ appConfig.version }}</span>
         </div>
         <div class="flex items-center gap-4">
           <span>Made with ❤️</span>
