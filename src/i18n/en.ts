@@ -61,5 +61,17 @@ export default {
   },
   app: {
     lastUpdate: 'Last update: {date}'
+  },
+  statistics: {
+    title: 'Link Statistics',
+    originalUrl: 'Original URL',
+    shortUrl: 'Short URL',
+    clicks: 'Click Count',
+    createdAt: 'Created On',
+    expiresAt: 'Expires On',
+    expired: 'Expired',
+    active: 'Active',
+    qrCode: 'QR Code',
+    downloadQr: 'Download QR Code'
   }
 }

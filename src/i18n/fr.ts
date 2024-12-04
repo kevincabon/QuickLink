@@ -59,6 +59,18 @@ export default {
       backHome: 'Retour à l\'accueil'
     }
   },
+  statistics: {
+    title: 'Statistiques du lien',
+    originalUrl: 'URL d\'origine',
+    shortUrl: 'Lien court',
+    clicks: 'Nombre de clics',
+    createdAt: 'Créé le',
+    expiresAt: 'Expire le',
+    expired: 'Expiré',
+    active: 'Actif',
+    qrCode: 'Code QR',
+    downloadQr: 'Télécharger le QR code'
+  },
   app: {
     lastUpdate: 'Dernière mise à jour : {date}'
   }
