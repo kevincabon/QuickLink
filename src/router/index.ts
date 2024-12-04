@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import Redirect from '../components/Redirect.vue';
 import Statistics from '../views/Statistics.vue';
+import NotFound from '../views/NotFound.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,6 +21,11 @@ const router = createRouter({
       path: '/:shortCode',
       name: 'redirect',
       component: Redirect
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: NotFound
     }
   ]
 });

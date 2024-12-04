@@ -98,8 +98,30 @@
       </div>
 
       <!-- Loading State -->
-      <div v-else class="flex justify-center items-center h-64">
+      <div v-if="isLoading" class="flex justify-center items-center h-64">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="max-w-2xl mx-auto text-center mt-20">
+        <div class="mb-8">
+          <ExclamationTriangleIcon class="w-24 h-24 mx-auto text-red-500 dark:text-red-400" />
+        </div>
+        <h2 class="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
+          {{ $t('statistics.error.notFound') }}
+        </h2>
+        <router-link
+          to="/"
+          class="inline-flex items-center px-6 py-3 mt-6 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-full hover:opacity-90 transition-opacity"
+        >
+          <PlusIcon class="w-5 h-5 mr-2" />
+          {{ $t('statistics.error.backHome') }}
+        </router-link>
+      </div>
+
+      <!-- Success State -->
+      <div v-else-if="linkData" class="max-w-4xl mx-auto">
+        <!-- ... reste du contenu ... -->
       </div>
     </div>
   </div>
@@ -109,7 +131,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useColorMode } from '@vueuse/core'
-import { SunIcon, MoonIcon, LinkIcon, LanguageIcon } from '@heroicons/vue/24/solid'
+import { SunIcon, MoonIcon, LinkIcon, LanguageIcon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/vue/24/solid'
 import { useI18n } from 'vue-i18n'
 import { supabase } from '../config/supabaseClient'
 
@@ -131,6 +153,9 @@ const linkData = ref<LinkData | null>(null)
 const colorMode = useColorMode()
 const isDarkMode = computed(() => colorMode.value === 'dark')
 const availableLocales = ['en', 'fr']
+
+const isLoading = ref(true)
+const error = ref(false)
 
 const isExpired = computed(() => {
   if (!linkData.value?.expires_at) return false
@@ -161,17 +186,27 @@ const toggleLanguage = () => {
 }
 
 onMounted(async () => {
-  const { data, error } = await supabase
-    .from('short_links')
-    .select('*')
-    .eq('custom_path', route.params.path)
-    .single()
+  try {
+    const { data, error: supabaseError } = await supabase
+      .from('short_links')
+      .select('*')
+      .eq('custom_path', route.params.path)
+      .single()
 
-  if (error) {
-    console.error('Error fetching link data:', error)
-    return
+    if (supabaseError) {
+      throw supabaseError
+    }
+
+    if (!data) {
+      error.value = true
+    } else {
+      linkData.value = data
+    }
+  } catch (e) {
+    console.error('Error fetching link data:', e)
+    error.value = true
+  } finally {
+    isLoading.value = false
   }
-
-  linkData.value = data
 })
 </script>
