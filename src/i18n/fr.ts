@@ -69,7 +69,16 @@ export default {
     expired: 'Expiré',
     active: 'Actif',
     qrCode: 'Code QR',
-    downloadQr: 'Télécharger le QR code'
+    downloadQr: 'Télécharger le QR code',
+    error: {
+      notFound: 'Aucun lien trouvé avec ce chemin personnalisé',
+      backHome: 'Créer un nouveau lien'
+    }
+  },
+  notFound: {
+    title: 'Page non trouvée',
+    description: 'La page que vous recherchez n\'existe pas ou a été déplacée.',
+    backHome: 'Retour à l\'accueil'
   },
   app: {
     lastUpdate: 'Dernière mise à jour : {date}'

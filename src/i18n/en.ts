@@ -72,6 +72,15 @@ export default {
     expired: 'Expired',
     active: 'Active',
     qrCode: 'QR Code',
-    downloadQr: 'Download QR Code'
+    downloadQr: 'Download QR Code',
+    error: {
+      notFound: 'No link found with this custom path',
+      backHome: 'Create a new link'
+    }
+  },
+  notFound: {
+    title: 'Page Not Found',
+    description: 'The page you are looking for doesn\'t exist or has been moved.',
+    backHome: 'Back to Home'
   }
 }
