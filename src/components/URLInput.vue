@@ -80,7 +80,7 @@ async function handleSubmit() {
   <form @submit.prevent="handleSubmit" class="w-full">
     <!-- Description principale -->
     <div class="text-center mb-6">
-      <p class="text-gray-600 dark:text-gray-300 mb-2">{{ t('welcome.title') }}</p>
+      <p class="text-gray-600 dark:text-gray-300 mb-2">{{ t('welcome.title') }} 🚀</p>
       <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('welcome.subtitle') }}</p>
     </div>
     <div class="flex flex-col gap-4">

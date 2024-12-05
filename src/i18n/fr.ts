@@ -1,7 +1,12 @@
 export default {
   welcome: {
-    title: 'Raccourcissez vos liens en quelques clics ! 🚀',
+    title: 'Raccourcissez vos liens en quelques clics !',
     subtitle: 'Collez votre URL longue ci-dessous et obtenez instantanément un lien court et facile à partager.'
+  },
+  navigation: {
+    home: 'Retour à l\'accueil',
+    changeLanguage: 'Changer de langue',
+    toggleTheme: 'Changer le thème'
   },
   form: {
     url: {
@@ -70,6 +75,7 @@ export default {
     active: 'Actif',
     qrCode: 'Code QR',
     downloadQr: 'Télécharger le QR code',
+    visitUrl: 'Visiter {url}',
     error: {
       notFound: 'Aucun lien trouvé avec ce chemin personnalisé',
       backHome: 'Créer un nouveau lien'

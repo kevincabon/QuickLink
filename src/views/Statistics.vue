@@ -2,41 +2,47 @@
   <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-900 dark:text-gray-100">
     <div class="container mx-auto px-4 py-8">
       <!-- Header avec logo, titre et boutons -->
-      <header class="flex justify-between items-center mb-12">
-        <router-link to="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <LinkIcon class="w-8 h-8 text-blue-600 dark:text-blue-400" />
+      <header class="flex justify-between items-center mb-12" role="banner">
+        <router-link to="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity" :aria-label="$t('navigation.home')">
+          <LinkIcon class="w-8 h-8 text-blue-600 dark:text-blue-400" aria-hidden="true" />
           <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 text-transparent bg-clip-text">
             LinkQR
           </h1>
         </router-link>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2" role="toolbar">
           <button
             @click="toggleLanguage"
             class="p-2 rounded-full bg-white dark:bg-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            :aria-label="$t('navigation.changeLanguage')"
           >
-            <LanguageIcon class="w-6 h-6 text-blue-500" />
+            <LanguageIcon class="w-6 h-6 text-blue-500" aria-hidden="true" />
           </button>
           <button
             @click="toggleColorMode"
             class="p-2 rounded-full bg-white dark:bg-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            :aria-label="$t('navigation.toggleTheme')"
           >
-            <SunIcon v-if="isDarkMode" class="w-6 h-6 text-yellow-500" />
-            <MoonIcon v-else class="w-6 h-6 text-gray-700" />
+            <SunIcon v-if="isDarkMode" class="w-6 h-6 text-yellow-500" aria-hidden="true" />
+            <MoonIcon v-else class="w-6 h-6 text-gray-700" aria-hidden="true" />
           </button>
         </div>
       </header>
 
-      <div v-if="linkData" class="max-w-4xl mx-auto">
+      <main v-if="linkData" class="max-w-4xl mx-auto" role="main">
         <h2 class="text-3xl font-bold mb-8 text-gray-800 dark:text-white">{{ $t('statistics.title') }}</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Original URL Card -->
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <article class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2">{{ $t('statistics.originalUrl') }}</h2>
-            <a :href="linkData.original_url" class="text-blue-600 dark:text-blue-400 break-all hover:underline" target="_blank">
+            <a :href="linkData.original_url" 
+               class="text-blue-600 dark:text-blue-400 break-all hover:underline" 
+               target="_blank"
+               rel="noopener noreferrer"
+               :aria-label="$t('statistics.visitUrl', { url: linkData.original_url })">
               {{ linkData.original_url }}
             </a>
-          </div>
+          </article>
 
           <!-- Short URL Card -->
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
@@ -95,7 +101,7 @@
             </a>
           </div>
         </div>
-      </div>
+      </main>
 
       <!-- Loading State -->
       <div v-if="isLoading" class="flex justify-center items-center h-64">

@@ -1,7 +1,12 @@
 export default {
   welcome: {
-    title: 'Shorten your links in a few clicks! 🚀',
+    title: 'Shorten your links in a few clicks!',
     subtitle: 'Paste your long URL below and instantly get a short, easy-to-share link.'
+  },
+  navigation: {
+    home: 'Back to home',
+    changeLanguage: 'Change language',
+    toggleTheme: 'Toggle theme'
   },
   form: {
     url: {
@@ -73,6 +78,7 @@ export default {
     active: 'Active',
     qrCode: 'QR Code',
     downloadQr: 'Download QR Code',
+    visitUrl: 'Visit {url}',
     error: {
       notFound: 'No link found with this custom path',
       backHome: 'Create a new link'
