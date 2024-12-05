@@ -15,7 +15,8 @@ const isDarkMode = computed(() => colorMode.value === 'dark');
 const shortLink = ref<ShortLink | null>(null);
 const error = ref('');
 const { locale, t } = useI18n();
-const availableLocales = ['en', 'fr']
+const availableLocales = ['en', 'fr'];
+const isLoading = ref(false);
 
 // Formater la date de mise à jour
 const formattedUpdateDate = computed(() => {
@@ -31,6 +32,10 @@ const formattedUpdateDate = computed(() => {
 async function handleURLSubmit(url: string, customPath?: string, expiresIn?: number) {
   try {
     error.value = '';
+    isLoading.value = true;
+    shortLink.value = null; // Reset shortLink before loading
+    // Simuler un délai minimal pour une meilleure UX
+    await new Promise(resolve => setTimeout(resolve, 800));
     shortLink.value = await shortenUrl(url, customPath, expiresIn);
     return { error: undefined }; // Retourne explicitement un objet avec error undefined en cas de succès
   } catch (e) {
@@ -38,6 +43,8 @@ async function handleURLSubmit(url: string, customPath?: string, expiresIn?: num
     error.value = errorMessage;
     console.error(e);
     return { error: errorMessage }; // Retourne l'erreur au composant URLInput
+  } finally {
+    isLoading.value = false;
   }
 }
 
@@ -81,7 +88,22 @@ function toggleLanguage() {
 
       <main class="max-w-2xl mx-auto">
         <URLInput @submit="handleURLSubmit" />
-        <template v-if="shortLink">
+        
+        <!-- Loading State -->
+        <div v-if="isLoading" class="mt-8 flex flex-col items-center justify-center space-y-4">
+          <div class="relative w-16 h-16">
+            <div class="absolute inset-0">
+              <div class="w-16 h-16 rounded-full border-4 border-blue-100 dark:border-blue-900"></div>
+            </div>
+            <div class="absolute inset-0">
+              <div class="w-16 h-16 rounded-full border-4 border-t-blue-600 dark:border-t-blue-400 animate-spin"></div>
+            </div>
+          </div>
+          <p class="text-gray-600 dark:text-gray-300 animate-pulse">{{ t('form.button.shortening') }}</p>
+        </div>
+
+        <!-- Result State -->
+        <template v-if="!isLoading && shortLink">
           <ResultCard :short-link="shortLink" class="mt-8" />
           <QRCodeGenerator :url="shortLink.short_url" class="mt-8" />
         </template>

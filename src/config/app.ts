@@ -4,6 +4,6 @@ interface AppConfig {
 }
 
 export const appConfig: AppConfig = {
-  version: '1.1',
-  lastUpdate: '2024-12-03' // À modifier facilement lors des mises à jour
+  version: '1.3',
+  lastUpdate: '2024-12-05'
 };
