@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://lnkqr.co/sitemap.xml
+
+# Interdire l'accès aux routes d'API et admin si nécessaire
+Disallow: /api/
+Disallow: /admin/
+
+# Permettre l'accès aux ressources statiques
+Allow: /assets/
+Allow: /images/
+Allow: /favicon.svg
